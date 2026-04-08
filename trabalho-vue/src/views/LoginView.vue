@@ -15,9 +15,9 @@ async function login() {
     });
 
     const token = response.data.token;
-
     localStorage.setItem("token", token);
-
+    
+    await buscarUsuarioLogado();
     alert("Login feito!");
     router.push("/home")
   } catch (e) {
@@ -30,6 +30,21 @@ function logout() {
   router.push("/login")
 }
 
+async function buscarUsuarioLogado() {
+  try {
+    const response = await api.get("/usuarios", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+    });
+    const usuario = response.data.find(u => u.email === email.value);
+
+    if (usuario) {
+      localStorage.setItem("papeis", JSON.stringify(usuario.papeisString));
+    }
+  } catch (e) {
+    console.error("Erro ao buscar usuário logado:", e);
+  }
+}
+
 
 </script>
 
@@ -40,10 +55,10 @@ function logout() {
     </div>
     <div class="login">
       <div class="texto">
-        <h1>Login</h1>
+        <h1>Faça o login</h1>
       </div>
       <div >
-        <input class="usuario" v-model="email" placeholder="Usuario" />
+        <input class="usuario"  v-model="email" placeholder="Usuario" />
       </div>
       <div>
         <input class="senha"  v-model="senha" type="password" placeholder="Senha" />
@@ -58,14 +73,19 @@ function logout() {
 </template>
 
 <style>
-.conteudo{
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  width: 1280px;
-  height: 700px;
-  
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap');
+.conteudo {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    width: 1280px;
+    height: 700px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 51%;
+    left: 52%;
 }
+
 .imagem img{
   width: 900px;
   height: 700px;
@@ -84,17 +104,16 @@ function logout() {
 }
 .usuario, .senha{
   width: 250px;
+  height: 40px;
   padding: 10px;
   border: 1px solid black;
   box-sizing: border-box;
 }
 
-.usuario input, .senha input{
-  width: 100%;
-}
 .senha,.usuario {
   margin-top: 5%;
   border-radius: 10px;
+  
 }
 
 .botoes{
@@ -108,8 +127,16 @@ function logout() {
 .botoes button{
    height: 40px;
    width: 250px;
-border-radius: 10px;
-background-color: #35496E;
-color: white;
+  border-radius: 10px;
+  background-color: #35496E;
+  color: white;
+  box-shadow: 2px 1px 6px 1px rgba(24, 24, 24, 0.384);
+}
+
+.texto h1{
+  font-family: "Merriweather", serif;
+  font-size: 40px;
+  font-weight: 800;
+  color: white;
 }
 </style>
